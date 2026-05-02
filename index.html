@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>お客様アンケート | TOTONOI Fujiyamanakako</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <script>
+  // ====================================================
+  //  CONFIG — TOTONOI Fujiyamanakako
+  // ====================================================
+  const CONFIG = {
+    shopName:       "TOTONOI Fujiyamanakako",
+    headerImageUrl: "header.png", // ← 同じフォルダに配置してください
+    themeColor:     "#6B4F2A",
+    accentColor:    "#A07840",
+    googleReviewUrl:"https://g.page/r/CR0VgfiHOeVTEAE/review",
+    reviewThreshold: 8,           // この点数以上で口コミ誘導
+    // ========================================
+    // GAS WebApp URL — デプロイ後に差し替え
+    // ========================================
+    gasUrl: "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec",
+  };
+  </script>
+
+  <style>
+    :root {
+      --theme:   #6B4F2A;
+      --accent:  #A07840;
+      --light:   #F5EFE6;
+      --bg:      #FAF7F3;
+      --surface: #FFFFFF;
+      --text:    #2C1F0E;
+      --muted:   #8C7355;
+      --border:  #DDD0BB;
+      --radius:  16px;
+      --shadow:  0 4px 24px rgba(107,79,42,.10);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+
+    /* ===== Header ===== */
+    .header-hero-wrap {
+      position: relative;
+      overflow: hidden;
+      max-height: 220px;
+    }
+    .header-hero {
+      width: 100%;
+      max-height: 220px;
+      object-fit: cover;
+      display: block;
+    }
+    .header-sub-bar {
+      background: var(--theme);
+      color: #fff;
+      text-align: center;
+      padding: 10px 16px 6px;
+    }
+    .progress-wrap {
+      background: rgba(255,255,255,.25);
+      height: 4px;
+      border-radius: 2px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: #fff;
+      border-radius: 2px;
+      transition: width .4s ease;
+      width: 0%;
+    }
+
+    /* ===== Intro card ===== */
+    .intro-card {
+      max-width: 600px;
+      margin: 20px auto 0;
+      padding: 0 16px;
+    }
+    .intro-text {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      font-size: 14px;
+      line-height: 1.85;
+      color: var(--muted);
+      box-shadow: var(--shadow);
+    }
+
+    /* ===== Container ===== */
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 16px 16px 24px;
+    }
+
+    /* ===== Question Card ===== */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px 20px;
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
+      opacity: 0;
+      transform: translateY(16px);
+      animation: slideUp .4s ease forwards;
+    }
+    @keyframes slideUp { to { opacity:1; transform:translateY(0); } }
+    .card:nth-child(1)  { animation-delay:.05s; }
+    .card:nth-child(2)  { animation-delay:.10s; }
+    .card:nth-child(3)  { animation-delay:.15s; }
+    .card:nth-child(4)  { animation-delay:.20s; }
+    .card:nth-child(5)  { animation-delay:.25s; }
+    .card:nth-child(6)  { animation-delay:.30s; }
+    .card:nth-child(7)  { animation-delay:.35s; }
+    .card:nth-child(8)  { animation-delay:.40s; }
+    .card:nth-child(9)  { animation-delay:.45s; }
+    .card:nth-child(10) { animation-delay:.50s; }
+    .card:nth-child(11) { animation-delay:.55s; }
+
+    .q-label {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.6;
+      margin-bottom: 14px;
+      color: var(--text);
+    }
+    .q-label .req {
+      display: inline-block;
+      background: var(--theme);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .q-label .opt-badge {
+      display: inline-block;
+      background: var(--border);
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    /* ===== Age selector ===== */
+    .age-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .age-btn {
+      padding: 12px 8px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: all .15s;
+      text-align: center;
+    }
+    .age-btn:hover { border-color: var(--accent); background: var(--light); }
+    .age-btn.selected { border-color: var(--theme); background: var(--theme); color: #fff; }
+
+    /* ===== Score (10点満点) ===== */
+    .score-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+    .score-btn {
+      width: 46px;
+      height: 46px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .score-btn:hover { border-color: var(--accent); background: var(--light); }
+    .score-btn.selected { border-color: var(--theme); background: var(--theme); color: #fff; }
+    .score-btn.s-high.selected { background: #2D6A4F; border-color: #2D6A4F; }
+    .score-hint {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+      padding: 0 2px;
+    }
+    .not-used-btn {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      background: none;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .15s;
+      text-align: center;
+    }
+    .not-used-btn:hover { border-color: var(--accent); color: var(--theme); background: var(--light); }
+    .not-used-btn.selected { border-color: var(--theme); background: var(--light); color: var(--theme); font-weight: 700; }
+
+    /* ===== Radio ===== */
+    .options { display: flex; flex-direction: column; gap: 10px; }
+    .opt-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 16px;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: border-color .15s, background .15s;
+      user-select: none;
+    }
+    .opt-label:hover { border-color: var(--accent); background: var(--light); }
+    .opt-label input { display: none; }
+    .opt-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color .15s, background .15s;
+    }
+    .opt-label.selected { border-color: var(--theme); background: var(--light); }
+    .opt-label.selected .opt-check {
+      background: var(--theme);
+      border-color: var(--theme);
+    }
+    .opt-label.selected .opt-check::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: #fff;
+      border-radius: 50%;
+    }
+
+    /* ===== Program checkboxes ===== */
+    .prog-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .prog-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all .15s;
+      user-select: none;
+    }
+    .prog-label:hover { border-color: var(--accent); background: var(--light); }
+    .prog-label input { display: none; }
+    .prog-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .prog-label.selected { border-color: var(--theme); background: var(--light); }
+    .prog-label.selected .prog-check { background: var(--theme); border-color: var(--theme); color: #fff; }
+
+    /* ===== Textarea ===== */
+    .answer-textarea {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      resize: vertical;
+      min-height: 130px;
+      transition: border-color .15s;
+      outline: none;
+      background: var(--bg);
+      line-height: 1.7;
+    }
+    .answer-textarea:focus { border-color: var(--accent); background: #fff; }
+
+    /* ===== Submit ===== */
+    .submit-wrap { text-align: center; margin-top: 8px; }
+    .submit-btn {
+      background: var(--theme);
+      color: #fff;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      padding: 16px 40px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 6px 20px rgba(107,79,42,.35);
+      transition: transform .15s, box-shadow .15s;
+    }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(107,79,42,.45); }
+    .submit-btn:disabled { background: #C8B89A; box-shadow: none; cursor: not-allowed; transform: none; }
+    .submit-note { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+    /* ===== Thank you ===== */
+    #thanks-screen { display:none; text-align:center; padding:40px 16px; animation: fadeIn .6s ease; }
+    @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+    .thanks-icon { font-size: 60px; margin-bottom: 14px; display: block; }
+    .thanks-title { font-family:'Noto Serif JP',serif; font-size:22px; font-weight:700; color:var(--theme); margin-bottom:10px; }
+    .thanks-body { font-size:14px; color:var(--muted); line-height:1.85; margin-bottom:28px; }
+
+    /* ===== Review guide ===== */
+    .review-guide {
+      background: var(--surface);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 22px 20px;
+      margin-bottom: 18px;
+      text-align: left;
+    }
+    .review-guide-title { font-weight:700; font-size:15px; color:var(--theme); margin-bottom:10px; }
+    .review-btn {
+      display: block;
+      background: #4285F4;
+      color: #fff;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 16px 24px;
+      border-radius: 50px;
+      text-decoration: none;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(66,133,244,.35);
+      transition: transform .15s, box-shadow .15s;
+      margin-bottom: 16px;
+    }
+    .review-btn:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(66,133,244,.45); }
+    .skip-link { font-size:13px; color:var(--muted); text-decoration:none; display:block; text-align:center; }
+    .skip-link:hover { color:var(--theme); }
+
+    /* ===== Sending overlay ===== */
+    .sending-overlay { display:none; position:fixed; inset:0; background:rgba(255,255,255,.85); z-index:100; align-items:center; justify-content:center; flex-direction:column; gap:16px; }
+    .sending-overlay.active { display:flex; }
+    .spinner { width:40px; height:40px; border:4px solid var(--border); border-top-color:var(--theme); border-radius:50%; animation:spin .8s linear infinite; }
+    @keyframes spin { to{ transform:rotate(360deg); } }
+
+    /* ===== Error ===== */
+    .error-msg { color:#D62828; font-size:12px; margin-top:8px; display:none; }
+    .card.has-error { border-color:#D62828; }
+
+    @media(max-width:480px){
+      .score-btn { width:40px; height:40px; font-size:14px; }
+      .age-grid { grid-template-columns: repeat(3,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="sending-overlay" id="sending-overlay">
+  <div class="spinner"></div>
+  <p style="font-size:14px;color:var(--muted)">送信中…</p>
+</div>
+
+<!-- Header -->
+<header>
+  <div class="header-hero-wrap">
+    <img class="header-hero" src="header.png" alt="TOTONOI Fujiyamanakako アンケートご協力のお願い" />
+  </div>
+  <div class="header-sub-bar">
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+  </div>
+</header>
+
+<!-- Intro -->
+<div class="intro-card">
+  <p class="intro-text">
+    この度はTOTONOIにご宿泊いただき誠にありがとうございます。<br>
+    今後のサービス向上のため、よろしければアンケートへのご協力をお願いいたします。<br>
+    お客様のご意見を大切に、より良い施設運営に努めてまいります。
+  </p>
+</div>
+
+<!-- Form -->
+<div class="container">
+  <form id="survey-form" novalidate>
+    <div id="questions-wrap"></div>
+    <div class="submit-wrap">
+      <button type="submit" class="submit-btn" id="submit-btn" disabled>アンケートを送信する</button>
+      <p class="submit-note">※ 回答内容はサービス向上のみに使用します</p>
+    </div>
+  </form>
+
+  <!-- Thanks -->
+  <div id="thanks-screen">
+    <span class="thanks-icon">🏕️</span>
+    <h2 class="thanks-title">ご回答ありがとうございました！</h2>
+    <p class="thanks-body">
+      いただいたご意見はスタッフ全員で共有し、<br>
+      より良い施設運営に活かしてまいります。<br>
+      またのお越しを心よりお待ちしております。
+    </p>
+
+    <div class="review-guide" id="review-guide" style="display:none;">
+      <p class="review-guide-title">⭐ よろしければGoogle口コミもお願いできますか？</p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px;">
+        皆様のご感想が、TOTONOIをご検討される方の参考になります。<br>ぜひ一言でも投稿いただけると大変嬉しいです。
+      </p>
+      <a href="https://g.page/r/CR0VgfiHOeVTEAE/review" target="_blank" rel="noopener" class="review-btn">
+        ⭐ Google口コミを書く
+      </a>
+    </div>
+
+    <a href="#" class="skip-link" onclick="location.reload();return false;">最初に戻る</a>
+  </div>
+</div>
+
+<script>
+(function(){
+  const answers = {};
+  let requiredIds = [];
+
+  // ======= 設問定義 =======
+  const QUESTIONS = [
+    {
+      id: 'age', type: 'age', required: true,
+      label: 'ご回答者様の年代を教えてください。',
+      options: ['10代','20代','30代','40代','50代','60代以上'],
+    },
+    { id:'overall',  type:'score10', required:true,  label:'施設全体の満足度を教えてください。' },
+    { id:'staff',    type:'score10', required:true,  label:'スタッフの接客サービスについて教えてください。' },
+    { id:'clean',    type:'score10', required:true,  label:'お部屋の清潔度について教えてください。' },
+    { id:'sauna',    type:'score10', required:false, label:'サウナの満足度を教えてください。', hasNotUsed:true },
+    { id:'dinner',   type:'score10', required:false, label:'夕食の満足度を教えてください。', hasNotUsed:true },
+    { id:'breakfast',type:'score10', required:false, label:'朝食の満足度を教えてください。', hasNotUsed:true },
+    {
+      id:'programs', type:'program', required:false,
+      label:'参加された体験プログラムの満足度を教えてください。',
+      programs:[
+        { key:'bonfire',    label:'🔥 焚き火体験' },
+        { key:'marshmallow',label:'🍡 マシュマロ作り体験' },
+        { key:'hangoui',    label:'🍚 飯盒炊飯体験' },
+      ],
+      hasNotUsed:true,
+    },
+    {
+      id:'revisit', type:'radio', required:true,
+      label:'また利用したいと思いますか？',
+      options:['はい','いいえ'],
+    },
+    {
+      id:'comment', type:'textarea', required:false,
+      label:'良かった点・改善してほしい点・ご要望・感想などをお聞かせください。',
+      placeholder:'どんな小さなことでもお気軽にご記入ください',
+    },
+  ];
+
+  // 必須IDリスト
+  requiredIds = QUESTIONS.filter(q=>q.required).map(q=>q.id);
+
+  // ======= レンダリング =======
+  const wrap = document.getElementById('questions-wrap');
+
+  QUESTIONS.forEach((q, idx) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = `card-${q.id}`;
+
+    const badge = q.required
+      ? `<span class="req">必須</span>`
+      : `<span class="opt-badge">任意</span>`;
+
+    card.innerHTML = `
+      <div class="q-label">${idx+1}. ${q.label}${badge}</div>
+      <div class="q-body" id="body-${q.id}"></div>
+      <div class="error-msg" id="err-${q.id}">この項目を選択してください</div>
+    `;
+    wrap.appendChild(card);
+
+    const body = document.getElementById(`body-${q.id}`);
+
+    if(q.type==='age') renderAge(body, q);
+    else if(q.type==='score10') renderScore10(body, q);
+    else if(q.type==='program') renderProgram(body, q);
+    else if(q.type==='radio') renderRadio(body, q);
+    else if(q.type==='textarea') renderTextarea(body, q);
+  });
+
+  // --- 年代 ---
+  function renderAge(container, q) {
+    const grid = document.createElement('div');
+    grid.className = 'age-grid';
+    q.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'age-btn';
+      btn.textContent = opt;
+      btn.addEventListener('click', () => {
+        grid.querySelectorAll('.age-btn').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+        answers[q.id] = opt;
+        clearError(q.id);
+        updateProgress();
+        checkSubmit();
+      });
+      grid.appendChild(btn);
+    });
+    container.appendChild(grid);
+  }
+
+  // --- 10点満点スコア ---
+  function renderScore10(container, q) {
+    const row = document.createElement('div');
+    row.className = 'score-row';
+
+    for(let i=1;i<=10;i++){
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'score-btn' + (i>=8?' s-high':'');
+      btn.textContent = i;
+      btn.dataset.val = i;
+      btn.addEventListener('click', ()=>{
+        // 「利用していない」解除
+        const nu = container.querySelector('.not-used-btn');
+        if(nu) nu.classList.remove('selected');
+
+        row.querySelectorAll('.score-btn').forEach(b=>b.classList.remove('selected'));
+        btn.classList.add('selected');
+        answers[q.id] = i;
+        clearError(q.id);
+        updateProgress();
+        checkSubmit();
+      });
+      row.appendChild(btn);
+    }
+    container.appendChild(row);
+
+    const hint = document.createElement('div');
+    hint.className = 'score-hint';
+    hint.innerHTML = '<span>😞 1 低い</span><span>10 高い 😊</span>';
+    container.appendChild(hint);
+
+    if(q.hasNotUsed){
+      const nu = document.createElement('button');
+      nu.type = 'button';
+      nu.className = 'not-used-btn';
+      nu.textContent = '利用していない';
+      nu.addEventListener('click', ()=>{
+        row.querySelectorAll('.score-btn').forEach(b=>b.classList.remove('selected'));
+        nu.classList.toggle('selected');
+        answers[q.id] = nu.classList.contains('selected') ? '利用していない' : undefined;
+        clearError(q.id);
+        updateProgress();
+        checkSubmit();
+      });
+      container.appendChild(nu);
+    }
+  }
+
+  // --- 体験プログラム ---
+  function renderProgram(container, q) {
+    // 注釈
+    const note = document.createElement('p');
+    note.style.cssText='font-size:12px;color:var(--muted);margin-bottom:10px;';
+    note.textContent='参加した体験を選び、それぞれ満足度（10点満点）をお知らせください。';
+    container.appendChild(note);
+
+    const progWrap = document.createElement('div');
+    progWrap.className = 'prog-grid';
+
+    q.programs.forEach(prog => {
+      const lbl = document.createElement('label');
+      lbl.className = 'prog-label';
+
+      const inp = document.createElement('input');
+      inp.type = 'checkbox';
+      inp.name = prog.key;
+
+      const chk = document.createElement('span');
+      chk.className = 'prog-check';
+
+      const txt = document.createElement('span');
+      txt.style.flex='1';
+      txt.textContent = prog.label;
+
+      // スコア（チェック後に表示）
+      const scoreWrap = document.createElement('div');
+      scoreWrap.style.cssText='display:none;margin-top:10px;';
+      const scoreRow = document.createElement('div');
+      scoreRow.className='score-row';
+      scoreRow.style.justifyContent='flex-start';
+      for(let i=1;i<=10;i++){
+        const sb = document.createElement('button');
+        sb.type='button';
+        sb.className='score-btn'+(i>=8?' s-high':'');
+        sb.style.cssText='width:36px;height:36px;font-size:13px;';
+        sb.textContent=i;
+        sb.addEventListener('click',(e)=>{
+          e.preventDefault();
+          scoreRow.querySelectorAll('.score-btn').forEach(b=>b.classList.remove('selected'));
+          sb.classList.add('selected');
+          if(!answers[q.id]) answers[q.id]={};
+          answers[q.id][prog.key]=i;
+          clearError(q.id);
+          updateProgress();
+          checkSubmit();
+        });
+        scoreRow.appendChild(sb);
+      }
+      scoreWrap.appendChild(scoreRow);
+
+      lbl.appendChild(inp);
+      lbl.appendChild(chk);
+      lbl.appendChild(txt);
+      progWrap.appendChild(lbl);
+      progWrap.appendChild(scoreWrap);
+
+      inp.addEventListener('change',()=>{
+        lbl.classList.toggle('selected', inp.checked);
+        if(inp.checked){
+          chk.textContent='✓';
+          scoreWrap.style.display='block';
+        } else {
+          chk.textContent='';
+          scoreWrap.style.display='none';
+          if(answers[q.id]) delete answers[q.id][prog.key];
+        }
+        updateProgress();
+        checkSubmit();
+      });
+    });
+
+    container.appendChild(progWrap);
+
+    // 利用していない
+    const nu = document.createElement('button');
+    nu.type='button';
+    nu.className='not-used-btn';
+    nu.textContent='体験プログラムに参加しなかった';
+    nu.addEventListener('click',()=>{
+      nu.classList.toggle('selected');
+      if(nu.classList.contains('selected')){
+        answers[q.id]='利用していない';
+        progWrap.querySelectorAll('input[type=checkbox]').forEach(i=>{ i.checked=false; i.dispatchEvent(new Event('change')); });
+        progWrap.style.opacity='.4';
+        progWrap.style.pointerEvents='none';
+      } else {
+        answers[q.id]=undefined;
+        progWrap.style.opacity='1';
+        progWrap.style.pointerEvents='';
+      }
+      updateProgress();
+      checkSubmit();
+    });
+    container.appendChild(nu);
+  }
+
+  // --- ラジオ ---
+  function renderRadio(container, q) {
+    const optWrap = document.createElement('div');
+    optWrap.className = 'options';
+    q.options.forEach(opt=>{
+      const lbl = document.createElement('label');
+      lbl.className = 'opt-label';
+      const inp = document.createElement('input');
+      inp.type='radio'; inp.name=q.id; inp.value=opt;
+      const chk = document.createElement('span');
+      chk.className='opt-check';
+      const txt = document.createElement('span');
+      txt.textContent = opt;
+      lbl.appendChild(inp); lbl.appendChild(chk); lbl.appendChild(txt);
+      optWrap.appendChild(lbl);
+      inp.addEventListener('change',()=>{
+        optWrap.querySelectorAll('.opt-label').forEach(l=>l.classList.remove('selected'));
+        lbl.classList.add('selected');
+        answers[q.id]=opt;
+        clearError(q.id);
+        updateProgress();
+        checkSubmit();
+      });
+    });
+    container.appendChild(optWrap);
+  }
+
+  // --- テキストエリア ---
+  function renderTextarea(container, q) {
+    const ta = document.createElement('textarea');
+    ta.className='answer-textarea';
+    ta.placeholder = q.placeholder||'こちらにご記入ください';
+    ta.addEventListener('input',()=>{
+      answers[q.id]=ta.value;
+      updateProgress();
+      checkSubmit();
+    });
+    container.appendChild(ta);
+  }
+
+  // ======= バリデーション・UI =======
+  function isAnswered(id){
+    const a=answers[id];
+    if(a===undefined||a===null) return false;
+    if(typeof a==='string'&&a.trim()==='') return false;
+    return true;
+  }
+
+  function updateProgress(){
+    const done = requiredIds.filter(id=>isAnswered(id)).length;
+    const pct = requiredIds.length ? (done/requiredIds.length)*100 : 100;
+    document.getElementById('progress-bar').style.width = pct+'%';
+  }
+
+  function checkSubmit(){
+    const allOk = requiredIds.every(id=>isAnswered(id));
+    document.getElementById('submit-btn').disabled = !allOk;
+  }
+
+  function showError(id){
+    document.getElementById(`card-${id}`).classList.add('has-error');
+    document.getElementById(`err-${id}`).style.display='block';
+  }
+  function clearError(id){
+    document.getElementById(`card-${id}`).classList.remove('has-error');
+    document.getElementById(`err-${id}`).style.display='none';
+  }
+
+  function validate(){
+    let ok=true;
+    requiredIds.forEach(id=>{
+      if(!isAnswered(id)){ showError(id); ok=false; }
+    });
+    return ok;
+  }
+
+  // ======= 送信 =======
+  document.getElementById('survey-form').addEventListener('submit', async(e)=>{
+    e.preventDefault();
+    if(!validate()){
+      const firstErr=document.querySelector('.has-error');
+      if(firstErr) firstErr.scrollIntoView({behavior:'smooth',block:'center'});
+      return;
+    }
+    document.getElementById('sending-overlay').classList.add('active');
+
+    const payload = {
+      timestamp: new Date().toISOString(),
+      ...answers
+    };
+
+    // GAS送信
+    try {
+      if(CONFIG.gasUrl && !CONFIG.gasUrl.includes('YOUR_DEPLOYMENT_ID')){
+        await fetch(CONFIG.gasUrl, {
+          method:'POST',
+          mode:'no-cors',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify(payload)
+        });
+      }
+    } catch(err){
+      console.warn('GAS送信エラー:', err);
+    }
+
+    showThanks();
+  });
+
+  function showThanks(){
+    document.getElementById('sending-overlay').classList.remove('active');
+    document.getElementById('survey-form').style.display='none';
+    const thanksEl = document.getElementById('thanks-screen');
+    thanksEl.style.display='block';
+
+    const overallScore = typeof answers['overall']==='number' ? answers['overall'] : 0;
+    if(overallScore >= CONFIG.reviewThreshold){
+      document.getElementById('review-guide').style.display='block';
+    }
+    thanksEl.scrollIntoView({behavior:'smooth'});
+  }
+
+})();
+</script>
+</body>
+</html>
