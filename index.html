@@ -17,12 +17,12 @@
     headerImageUrl: "header.png", // ← 同じフォルダに配置してください
     themeColor:     "#6B4F2A",
     accentColor:    "#A07840",
-    googleReviewUrl:"https://g.page/r/CR0VgfiHOeVTEAE/review",
+    googleReviewUrl:"https://search.google.com/local/writereview?placeid=ChIJpxQqNPpvGWARHRWC-Ic55VM",
     reviewThreshold: 8,           // この点数以上で口コミ誘導
     // ========================================
     // GAS WebApp URL — デプロイ後に差し替え
     // ========================================
-    gasUrl: "https://script.google.com/macros/s/AKfycbyO2JNAwh5q058MBcRUHejOMkmNKlPojLG0eVIoox_3SVoLtHAJs-Nb4t7aRim_FHtZ/exec",
+    gasUrl: "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec",
   };
   </script>
 
@@ -452,12 +452,68 @@
       またのお越しを心よりお待ちしております。
     </p>
 
+    <!-- 口コミ誘導エリア（8点以上のみ表示） -->
     <div class="review-guide" id="review-guide" style="display:none;">
       <p class="review-guide-title">⭐ よろしければGoogle口コミもお願いできますか？</p>
-      <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px;">
-        皆様のご感想が、TOTONOIをご検討される方の参考になります。<br>ぜひ一言でも投稿いただけると大変嬉しいです。
+      <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px;">
+        皆様のご感想が、TOTONOIをご検討される方の大きな参考になります。<br>
+        ぜひ一言でも投稿いただけると大変嬉しいです。
       </p>
-      <a href="https://g.page/r/CR0VgfiHOeVTEAE/review" target="_blank" rel="noopener" class="review-btn">
+
+      <!-- コメントがある場合のみ表示されるコピーブロック -->
+      <div id="copy-block" style="display:none;">
+        <p style="font-size:13px;font-weight:700;color:var(--theme);margin-bottom:8px;">📋 先ほどのご回答をコピーして、そのまま口コミに貼り付けられます</p>
+        <div id="comment-preview" style="
+          background:var(--bg);
+          border:1px solid var(--border);
+          border-radius:10px;
+          padding:14px 16px;
+          font-size:13px;
+          line-height:1.8;
+          color:var(--text);
+          margin-bottom:12px;
+          white-space:pre-wrap;
+          word-break:break-word;
+        "></div>
+
+        <button id="copy-btn" type="button" style="
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          gap:8px;
+          width:100%;
+          padding:13px 16px;
+          border:2px solid var(--accent);
+          border-radius:10px;
+          background:none;
+          font-family:'Zen Kaku Gothic New',sans-serif;
+          font-size:14px;
+          font-weight:700;
+          color:var(--theme);
+          cursor:pointer;
+          transition:all .2s;
+          margin-bottom:14px;
+        ">
+          <span id="copy-icon">📋</span>
+          <span id="copy-label">コメントをコピーする</span>
+        </button>
+
+        <!-- コピー後に表示される手順 -->
+        <div id="copy-steps" style="display:none;background:var(--light);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.9;color:var(--muted);">
+          ✅ コピーしました！<br>
+          ① 下の「Google口コミを書く」をタップ<br>
+          ② 入力欄を<strong style="color:var(--theme)">長押し → 貼り付け</strong>するだけで完了！
+        </div>
+      </div>
+
+      <!-- コメントがない場合のシンプル説明 -->
+      <div id="no-comment-msg" style="display:none;font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.7;">
+        一言でもご感想を投稿いただけると大変嬉しいです。
+      </div>
+
+      <!-- Google口コミボタン（コメントある場合：コピー後に表示 / ない場合：最初から表示） -->
+      <a id="review-btn" href="https://search.google.com/local/writereview?placeid=ChIJpxQqNPpvGWARHRWC-Ic55VM"
+         target="_blank" rel="noopener" class="review-btn" style="display:none;">
         ⭐ Google口コミを書く
       </a>
     </div>
@@ -823,6 +879,57 @@
     const overallScore = typeof answers['overall']==='number' ? answers['overall'] : 0;
     if(overallScore >= CONFIG.reviewThreshold){
       document.getElementById('review-guide').style.display='block';
+
+      const commentText = (answers['comment'] || '').trim();
+      const reviewBtn = document.getElementById('review-btn');
+
+      if(commentText){
+        // コメントあり：プレビュー＋コピーボタン表示、口コミボタンはコピー後に出す
+        document.getElementById('copy-block').style.display='block';
+        document.getElementById('comment-preview').textContent = commentText;
+
+        const copyBtn = document.getElementById('copy-btn');
+        const copyLabel = document.getElementById('copy-label');
+        const copyIcon = document.getElementById('copy-icon');
+        const copySteps = document.getElementById('copy-steps');
+        let copied = false;
+
+        copyBtn.addEventListener('click', async()=>{
+          if(copied) return;
+          try {
+            await navigator.clipboard.writeText(commentText);
+          } catch {
+            // フォールバック
+            const ta = document.createElement('textarea');
+            ta.value = commentText;
+            ta.style.cssText='position:fixed;opacity:0;';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+          }
+          copied = true;
+          copyBtn.style.background = 'var(--theme)';
+          copyBtn.style.color = '#fff';
+          copyBtn.style.borderColor = 'var(--theme)';
+          copyIcon.textContent = '✅';
+          copyLabel.textContent = 'コピーしました！';
+          copySteps.style.display = 'block';
+          // 口コミボタンをアニメーションで表示
+          reviewBtn.style.display = 'block';
+          reviewBtn.style.opacity = '0';
+          reviewBtn.style.transform = 'translateY(8px)';
+          reviewBtn.style.transition = 'opacity .4s ease, transform .4s ease';
+          requestAnimationFrame(()=>{
+            reviewBtn.style.opacity = '1';
+            reviewBtn.style.transform = 'translateY(0)';
+          });
+        });
+      } else {
+        // コメントなし：口コミボタンをすぐ表示
+        document.getElementById('no-comment-msg').style.display='block';
+        reviewBtn.style.display='block';
+      }
     }
     thanksEl.scrollIntoView({behavior:'smooth'});
   }
