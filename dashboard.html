@@ -116,6 +116,17 @@ main{max-width:1280px;margin:0 auto;padding:20px 16px 40px;}
   </select>
   <label>月</label>
   <select id="filter-month"><option value="all">すべて</option></select>
+  <label>年代</label>
+  <select id="filter-age">
+    <option value="all">すべて</option>
+    <option value="10代">10代</option>
+    <option value="20代">20代</option>
+    <option value="30代">30代</option>
+    <option value="40代">40代</option>
+    <option value="50代">50代</option>
+    <option value="60代以上">60代以上</option>
+    <option value="不明">不明</option>
+  </select>
   <button class="btn" onclick="applyFilter()">絞り込み</button>
   <button class="btn secondary" onclick="resetFilter()">リセット</button>
   <span id="record-count"></span>
@@ -215,9 +226,11 @@ let currentCommentFilter = 'all';
 function applyFilter(){
   const period = document.getElementById('filter-period').value;
   const month  = document.getElementById('filter-month').value;
+  const age    = document.getElementById('filter-age').value;
   filteredData = RAW_DATA.filter(r=>{
     if(period !== 'all' && !r.month.startsWith(period)) return false;
     if(month  !== 'all' && r.month !== month) return false;
+    if(age    !== 'all' && (r.age || '不明') !== age) return false;
     return true;
   });
   render();
@@ -225,6 +238,7 @@ function applyFilter(){
 function resetFilter(){
   document.getElementById('filter-period').value='all';
   document.getElementById('filter-month').value='all';
+  document.getElementById('filter-age').value='all';
   filteredData=[...RAW_DATA];
   render();
 }
@@ -437,6 +451,7 @@ function renderMonthTable(){
 function buildMonthOptions(){
   const months = [...new Set(RAW_DATA.map(r=>r.month))].sort();
   const sel = document.getElementById('filter-month');
+  sel.length = 1;
   months.forEach(m=>{
     const opt=document.createElement('option');
     opt.value=m; opt.textContent=m;
