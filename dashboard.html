@@ -358,24 +358,23 @@ function renderScoreBars(){
 }
 
 // ===== チャート共通 =====
+// 縦軸の下限：基本7.5、それより低い値があれば0.5刻みで下げる
+function yMin(arr){ const v=arr.filter(x=>x!=null); return v.length?Math.min(7.5,Math.floor(Math.min(...v)*2)/2):7.5; }
 function draw(key,id,cfg){ if(charts[key]) charts[key].destroy(); charts[key]=new Chart($(id),cfg); }
 
 function renderTrendChart(){
   const months=[...new Set(filteredData.map(r=>r.month))].sort();
   const rowsOf=m=>filteredData.filter(r=>r.month===m);
   const line=(k,label,color,hidden)=>({type:'line',label,yAxisID:'y',data:months.map(m=>{const v=vals(rowsOf(m),k);return v.length?+avg(v).toFixed(2):null;}),
-    borderColor:color,backgroundColor:color,borderWidth:k==='overall'?3:2,pointRadius:k==='overall'?4:2.5,tension:.3,spanGaps:true,hidden});
+    borderColor:color,backgroundColor:color,borderWidth:k==='overall'?3:2,pointRadius:k==='overall'?4:2.5,tension:0,spanGaps:true,hidden});
+  const ds=[line('overall','施設全体',C.theme,false),line('staff','スタッフ',C.green,true),line('clean','清潔度','#1a6faa',true),line('sauna','サウナ','#C2713A',true),line('dinner','夕食','#8E5A9B',true)];
   draw('trend','ch-trend',{
     data:{labels:months.map(m=>m.slice(2).replace('-','/')),datasets:[
-      line('overall','施設全体',C.theme,false),
-      line('staff','スタッフ',C.green,true),
-      line('clean','清潔度','#1a6faa',true),
-      line('sauna','サウナ','#C2713A',true),
-      line('dinner','夕食','#8E5A9B',true),
+      ...ds,
       {type:'bar',label:'回答件数',yAxisID:'y2',data:months.map(m=>rowsOf(m).length),backgroundColor:'rgba(201,188,168,.45)',borderRadius:4,order:10},
     ]},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      scales:{y:{min:0,max:10,ticks:{stepSize:2},title:{display:true,text:'平均点'}},
+      scales:{y:{min:yMin(ds.flatMap(d=>d.data)),max:10,ticks:{stepSize:.5},title:{display:true,text:'平均点'}},
               y2:{position:'right',beginAtZero:true,grid:{display:false},title:{display:true,text:'件数'}},
               x:{grid:{display:false}}},
       plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8,font:{size:12}}},
@@ -386,14 +385,15 @@ function renderTrendChart(){
 function renderAgeChart(){
   const labels=AGES.filter(a=>filteredData.some(r=>(r.age||'不明')===a));
   const rowsOf=a=>filteredData.filter(r=>(r.age||'不明')===a);
+  const ageAvg=labels.map(a=>{const v=vals(rowsOf(a),'overall');return v.length?+avg(v).toFixed(2):null;});
   draw('age','ch-age',{
     data:{labels,datasets:[
       {type:'bar',label:'回答数',data:labels.map(a=>rowsOf(a).length),backgroundColor:labels.map(a=>a==='不明'?C.light:C.accent),borderRadius:6,yAxisID:'y',order:2},
-      {type:'line',label:'平均スコア',data:labels.map(a=>{const v=vals(rowsOf(a),'overall');return v.length?+avg(v).toFixed(2):null;}),
+      {type:'line',label:'平均スコア',data:ageAvg,
         yAxisID:'y2',showLine:false,pointRadius:7,pointHoverRadius:9,backgroundColor:C.green,borderColor:'#fff',borderWidth:2,order:1},
     ]},
     options:{responsive:true,maintainAspectRatio:false,
-      scales:{y:{beginAtZero:true,title:{display:true,text:'回答数'}},y2:{position:'right',min:0,max:10,grid:{display:false},title:{display:true,text:'平均点'}},x:{grid:{display:false}}},
+      scales:{y:{beginAtZero:true,title:{display:true,text:'回答数'}},y2:{position:'right',min:yMin(ageAvg),max:10,ticks:{stepSize:.5},grid:{display:false},title:{display:true,text:'平均点'}},x:{grid:{display:false}}},
       plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8}},
         tooltip:{callbacks:{label:c=>c.dataset.type==='bar'?` ${c.parsed.y}件`:` 平均 ${c.parsed.y?.toFixed(1)}点`}}}}
   });
