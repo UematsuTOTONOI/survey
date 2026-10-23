@@ -9,207 +9,244 @@
 <style>
 :root{
   --theme:#6B4F2A;--accent:#A07840;--light:#F5EFE6;--bg:#FAF7F3;
-  --surface:#fff;--text:#2C1F0E;--muted:#8C7355;--border:#DDD0BB;
-  --green:#2D6A4F;--red:#C0392B;--blue:#1a6faa;
-  --radius:14px;--shadow:0 2px 16px rgba(107,79,42,.09);
+  --surface:#fff;--text:#2C1F0E;--muted:#7A6347;--border:#E6DCCB;
+  --green:#2D6A4F;--green-bg:#E3F1EA;--red:#B23A2B;--red-bg:#FBE7E4;--amber:#9A6B1F;--amber-bg:#FBF1DC;--blue:#1a6faa;
+  --radius:14px;--shadow:0 1px 3px rgba(107,79,42,.06),0 6px 20px rgba(107,79,42,.06);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:"Zen Kaku Gothic New",sans-serif;background:var(--bg);color:var(--text);font-size:14px;}
+body{font-family:"Zen Kaku Gothic New",sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;}
+button,select,input{font-family:inherit;}
 
-/* Header */
-header{background:var(--theme);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-header h1{font-family:"Noto Serif JP",serif;font-size:18px;font-weight:700;}
-.header-sub{font-size:11px;opacity:.7;margin-top:2px;}
-.header-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+/* Header + Filter (sticky) */
+.top{position:sticky;top:0;z-index:10;box-shadow:0 2px 10px rgba(0,0,0,.06);}
+header{background:var(--theme);color:#fff;padding:12px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+header h1{font-family:"Noto Serif JP",serif;font-size:18px;}
+.header-sub{font-size:11px;opacity:.75;}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:11px;}
+.header-right .status{opacity:.8;}
+.btn-ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;}
+.btn-ghost:hover{background:rgba(255,255,255,.25);}
 
-/* Filter bar */
-.filter-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
-.filter-bar label{font-size:12px;color:var(--muted);font-weight:500;}
-.filter-bar select{border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;background:var(--bg);cursor:pointer;}
-.btn{background:var(--theme);color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
-.btn:hover{opacity:.85;}
-.btn.secondary{background:none;border:1px solid var(--border);color:var(--muted);}
-#record-count{font-size:12px;color:var(--muted);margin-left:auto;}
+.filter-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;gap:10px 16px;align-items:center;flex-wrap:wrap;}
+.f-item{display:flex;align-items:center;gap:6px;}
+.f-item label{font-size:12px;color:var(--muted);font-weight:500;}
+.filter-bar select{border:1px solid var(--border);border-radius:8px;padding:6px 28px 6px 10px;font-size:13px;background:var(--bg);cursor:pointer;color:var(--text);}
+.filter-bar select.on{border-color:var(--accent);background:var(--light);font-weight:700;}
+.btn-reset{background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;text-decoration:underline;display:none;}
+.btn-reset.show{display:inline;}
+#record-count{font-size:13px;color:var(--muted);margin-left:auto;}
+#record-count b{color:var(--theme);font-size:16px;}
 
 /* Layout */
-main{max-width:1280px;margin:0 auto;padding:20px 16px 40px;}
+main{max-width:1280px;margin:0 auto;padding:20px 16px 48px;}
+.section-title{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin:24px 2px 10px;}
 
 /* KPI */
-.kpi-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:20px;}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 14px;text-align:center;box-shadow:var(--shadow);}
-.kpi .val{font-size:34px;font-weight:700;line-height:1;color:var(--theme);}
-.kpi .val.green{color:var(--green);}
-.kpi .val.blue{color:var(--blue);}
-.kpi .val.red{color:var(--red);}
-.kpi .lbl{font-size:11px;color:var(--muted);margin-top:5px;}
-.kpi .sub{font-size:10px;color:var(--border);margin-top:2px;}
+.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;}
+@media(max-width:1000px){.kpi-row{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:560px){.kpi-row{grid-template-columns:repeat(2,1fr);}}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);border-top:3px solid var(--border);}
+.kpi.good{border-top-color:var(--green);} .kpi.mid{border-top-color:var(--accent);} .kpi.bad{border-top-color:var(--red);}
+.kpi .lbl{font-size:12px;color:var(--muted);font-weight:500;}
+.kpi .val{font-size:30px;font-weight:700;line-height:1.2;margin-top:4px;color:var(--text);font-variant-numeric:tabular-nums;}
+.kpi .val small{font-size:13px;color:var(--muted);font-weight:500;margin-left:2px;}
+.kpi .sub{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* Cards */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.grid2>*,.grid3>*{min-width:0;}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr;}}
+@media(max-width:700px){.top{position:static;}header,.filter-bar{padding-left:16px;padding-right:16px;}.header-right{margin-left:0;}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);}
+.card h2{font-size:15px;font-weight:700;color:var(--theme);margin-bottom:4px;}
+.card .desc{font-size:12px;color:var(--muted);margin-bottom:14px;}
+.chart-wrap{position:relative;height:240px;}
 
 /* NPS */
-.nps-bar-wrap{margin:10px 0 6px;height:10px;border-radius:5px;overflow:hidden;display:flex;}
+.nps-wrap{display:flex;gap:28px;align-items:center;flex-wrap:wrap;}
+#nps-val{font-size:52px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;}
+.nps-bar-wrap{height:14px;border-radius:7px;overflow:hidden;display:flex;background:var(--light);}
 .nps-seg{height:100%;transition:width .6s;}
+.nps-legend{display:flex;justify-content:space-between;gap:8px;font-size:12px;margin-top:8px;flex-wrap:wrap;}
 
-/* Grid */
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;}
-@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr;}}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);}
-.card h2{font-size:14px;font-weight:700;color:var(--theme);margin-bottom:14px;display:flex;align-items:center;gap:6px;}
-.card.wide{grid-column:1/-1;}
-.chart-wrap{position:relative;height:220px;}
+/* Score bars */
+.score-row{display:grid;grid-template-columns:64px 1fr 40px 44px;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--border);}
+.score-row:last-child{border-bottom:none;}
+.score-row .l{font-size:13px;}
+.score-bar-bg{height:10px;background:var(--light);border-radius:5px;overflow:hidden;}
+.score-bar-fill{height:100%;border-radius:5px;transition:width .5s;}
+.score-row .v{font-size:15px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;}
+.score-row .n{font-size:11px;color:var(--muted);text-align:right;}
 
-/* Tab */
-.tab-row{display:flex;gap:0;margin-bottom:14px;border-bottom:2px solid var(--border);}
-.tab{padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit;}
-.tab.active{color:var(--theme);border-bottom-color:var(--theme);font-weight:700;}
-
-/* Comment list */
-.comment-list{display:flex;flex-direction:column;gap:10px;max-height:420px;overflow-y:auto;}
-.comment-item{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
-.comment-meta{display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap;}
-.score-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;}
-.score-high{background:#d4edda;color:#1a5c30;}
-.score-mid{background:#fff3cd;color:#7a5c00;}
-.score-low{background:#fde;color:#8b0000;}
-.comment-date{font-size:11px;color:var(--muted);}
-.comment-text{font-size:13px;line-height:1.7;color:var(--text);}
-.empty-msg{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
+/* Comments */
+.c-tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+.tab-row{display:flex;gap:6px;flex-wrap:wrap;}
+.tab{padding:6px 12px;font-size:12px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--muted);cursor:pointer;}
+.tab .cnt{display:inline-block;margin-left:4px;font-weight:700;}
+.tab.active{background:var(--theme);border-color:var(--theme);color:#fff;}
+.c-search{flex:1;min-width:180px;border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:13px;background:var(--bg);}
+.c-sort{border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;background:var(--bg);}
+.comment-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));gap:10px;max-height:560px;overflow-y:auto;padding-right:4px;}
+.comment-item{background:var(--bg);border:1px solid var(--border);border-left:4px solid var(--border);border-radius:10px;padding:12px 14px;}
+.comment-item.high{border-left-color:var(--green);} .comment-item.mid{border-left-color:var(--accent);} .comment-item.low{border-left-color:var(--red);}
+.comment-meta{display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap;font-size:11px;color:var(--muted);}
+.score-badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:12px;font-weight:700;}
+.score-high{background:var(--green-bg);color:var(--green);}
+.score-mid{background:var(--amber-bg);color:var(--amber);}
+.score-low{background:var(--red-bg);color:var(--red);}
+.comment-text{font-size:13px;line-height:1.75;white-space:pre-wrap;word-break:break-word;}
+.comment-text mark{background:#FFE9A8;padding:0 1px;border-radius:2px;}
+.more-btn{display:block;margin:12px auto 0;background:none;border:1px solid var(--border);border-radius:8px;padding:7px 18px;font-size:12px;color:var(--muted);cursor:pointer;}
+.empty-msg{text-align:center;padding:40px;color:var(--muted);font-size:13px;grid-column:1/-1;}
 
 /* Month table */
-.month-table{width:100%;border-collapse:collapse;font-size:12px;}
-.month-table th{background:var(--theme);color:#fff;padding:7px 10px;text-align:center;font-weight:500;}
-.month-table td{padding:7px 10px;border-bottom:1px solid var(--border);text-align:center;}
-.month-table tr:nth-child(even) td{background:var(--light);}
-.month-table .left{text-align:left;}
-
-/* Score bar */
-.score-bar-wrap{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.score-bar-lbl{font-size:12px;color:var(--muted);width:60px;flex-shrink:0;}
-.score-bar-bg{flex:1;height:10px;background:var(--border);border-radius:5px;overflow:hidden;}
-.score-bar-fill{height:100%;border-radius:5px;transition:width .5s;background:var(--green);}
-.score-bar-val{font-size:12px;font-weight:700;color:var(--theme);width:28px;text-align:right;}
-
-/* Stat row */
-.stat-row{display:flex;gap:4px;align-items:center;font-size:12px;color:var(--muted);margin-top:6px;}
-
-/* Chatwork GAS */
-.code-block{background:#1e1e1e;color:#d4d4d4;border-radius:10px;padding:16px;font-family:monospace;font-size:12px;overflow-x:auto;margin-top:10px;line-height:1.6;}
+.table-wrap{overflow-x:auto;}
+.month-table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums;}
+.month-table th{background:var(--light);color:var(--theme);padding:8px 10px;text-align:center;font-weight:700;font-size:12px;position:sticky;top:0;white-space:nowrap;}
+.month-table td{padding:7px 10px;border-bottom:1px solid var(--border);text-align:center;white-space:nowrap;}
+.month-table tbody tr{cursor:pointer;}
+.month-table tbody tr:hover td{outline:1px solid transparent;filter:brightness(.97);}
+.month-table .left{text-align:left;font-weight:700;}
+.month-table .total td{font-weight:700;background:var(--light);border-top:2px solid var(--border);cursor:default;}
+.legend-note{font-size:11px;color:var(--muted);margin-top:8px;}
 </style>
 </head>
 <body>
 
+<div class="top">
 <header>
   <div>
     <h1>🏕️ TOTONOIアンケートダッシュボード</h1>
     <div class="header-sub">Glamping Village Fujiyamanakako — 過去データ + 新規回答</div>
   </div>
   <div class="header-right">
-    <span id="last-updated" style="font-size:11px;opacity:.7;"></span>
+    <span id="last-updated" class="status"></span>
+    <button class="btn-ghost" onclick="loadFromGAS()" title="最新の回答を読み込み">⟳ 更新</button>
+    <button class="btn-ghost" onclick="downloadCSV()" title="表示中のデータをCSVで保存">⬇ CSV</button>
   </div>
 </header>
 
 <div class="filter-bar">
-  <label>期間</label>
-  <select id="filter-period">
-    <option value="all">全期間</option>
-    <option value="2025">2025年</option>
-    <option value="2026">2026年</option>
-  </select>
-  <label>月</label>
-  <select id="filter-month"><option value="all">すべて</option></select>
-  <label>年代</label>
-  <select id="filter-age">
-    <option value="all">すべて</option>
-    <option value="10代">10代</option>
-    <option value="20代">20代</option>
-    <option value="30代">30代</option>
-    <option value="40代">40代</option>
-    <option value="50代">50代</option>
-    <option value="60代以上">60代以上</option>
-    <option value="不明">不明</option>
-  </select>
-  <button class="btn" onclick="applyFilter()">絞り込み</button>
-  <button class="btn secondary" onclick="resetFilter()">リセット</button>
+  <div class="f-item">
+    <label for="filter-period">期間</label>
+    <select id="filter-period">
+      <option value="all">全期間</option>
+      <option value="2025">2025年</option>
+      <option value="2026">2026年</option>
+    </select>
+  </div>
+  <div class="f-item">
+    <label for="filter-month">月</label>
+    <select id="filter-month"><option value="all">すべて</option></select>
+  </div>
+  <div class="f-item">
+    <label for="filter-age">年代</label>
+    <select id="filter-age">
+      <option value="all">すべて</option>
+      <option value="10代">10代</option>
+      <option value="20代">20代</option>
+      <option value="30代">30代</option>
+      <option value="40代">40代</option>
+      <option value="50代">50代</option>
+      <option value="60代以上">60代以上</option>
+      <option value="不明">不明</option>
+    </select>
+  </div>
+  <button class="btn-reset" id="btn-reset" onclick="resetFilter()">✕ 絞り込みを解除</button>
   <span id="record-count"></span>
+</div>
 </div>
 
 <main>
-  <!-- KPI -->
+  <div class="section-title">サマリー</div>
   <div class="kpi-row" id="kpi-row"></div>
 
-  <!-- NPS -->
-  <div class="card" style="margin-bottom:16px;" id="nps-card">
-    <h2>📊 NPS（ネット・プロモーター・スコア）</h2>
-    <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;">
-      <div style="text-align:center;">
-        <div id="nps-val" style="font-size:48px;font-weight:700;color:var(--theme);line-height:1;"></div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;">NPS スコア</div>
-      </div>
-      <div style="flex:1;min-width:200px;">
-        <div class="nps-bar-wrap" id="nps-bar"></div>
-        <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:4px;">
-          <span style="color:var(--red);">😞 批判者（1-6）<span id="nps-d"></span>名</span>
-          <span style="color:var(--muted);">😐 中立（7-8）<span id="nps-n"></span>名</span>
-          <span style="color:var(--green);">😊 推奨者（9-10）<span id="nps-p"></span>名</span>
-        </div>
-        <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.7;">
-          NPS = 推奨者% − 批判者%｜-100〜+100の範囲｜<span style="color:var(--green);font-weight:700;">50以上は「優秀」</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- スコア平均 + 月別推移 -->
+  <div class="section-title">満足度</div>
   <div class="grid2">
     <div class="card">
-      <h2>⭐ 項目別平均スコア</h2>
-      <div id="score-bars"></div>
+      <h2>NPS（おすすめ度）</h2>
+      <div class="desc">施設全体の点数から算出｜推奨者% − 批判者%｜50以上で「優秀」</div>
+      <div class="nps-wrap">
+        <div style="text-align:center;min-width:90px;">
+          <div id="nps-val"></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">NPS</div>
+        </div>
+        <div style="flex:1;min-width:220px;">
+          <div class="nps-bar-wrap" id="nps-bar"></div>
+          <div class="nps-legend">
+            <span style="color:var(--red);">● 批判者 1〜6点 <b id="nps-d"></b></span>
+            <span style="color:var(--muted);">● 中立 7〜8点 <b id="nps-n"></b></span>
+            <span style="color:var(--green);">● 推奨者 9〜10点 <b id="nps-p"></b></span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:18px;">
+        <div class="desc" style="margin-bottom:6px;">施設全体の点数分布</div>
+        <div class="chart-wrap" style="height:150px;"><canvas id="ch-dist"></canvas></div>
+      </div>
     </div>
     <div class="card">
-      <h2>📈 月別・施設全体スコア推移</h2>
-      <div class="chart-wrap"><canvas id="ch-trend"></canvas></div>
+      <h2>項目別平均スコア</h2>
+      <div class="desc">10点満点｜緑 8点以上・茶 5〜7点・赤 5点未満｜n = 回答数</div>
+      <div id="score-bars"></div>
     </div>
   </div>
 
-  <!-- 年代 + 再利用 + スコア分布 -->
-  <div class="grid3">
+  <div class="section-title">推移・属性</div>
+  <div class="card" style="margin-bottom:16px;">
+    <h2>月別推移</h2>
+    <div class="desc">線 = 平均スコア（凡例クリックで表示切替）／棒 = 回答件数</div>
+    <div class="chart-wrap" style="height:280px;"><canvas id="ch-trend"></canvas></div>
+  </div>
+  <div class="grid2">
     <div class="card">
-      <h2>👥 年代分布</h2>
+      <h2>年代別の回答数と満足度</h2>
+      <div class="desc">棒 = 回答数／点 = 施設全体の平均スコア</div>
       <div class="chart-wrap"><canvas id="ch-age"></canvas></div>
     </div>
     <div class="card">
-      <h2>🔄 再利用意向</h2>
+      <h2>再利用意向</h2>
+      <div class="desc">「また利用したいですか？」への回答</div>
       <div class="chart-wrap"><canvas id="ch-revisit"></canvas></div>
     </div>
-    <div class="card">
-      <h2>📊 施設全体スコア分布</h2>
-      <div class="chart-wrap"><canvas id="ch-dist"></canvas></div>
-    </div>
   </div>
 
-  <!-- コメント一覧（スコア別タブ） -->
-  <div class="card wide" style="margin-bottom:16px;">
-    <h2>💬 お客様コメント一覧</h2>
-    <div class="tab-row">
-      <button class="tab active" onclick="showCommentTab('all',this)">すべて</button>
-      <button class="tab" onclick="showCommentTab('high',this)">😊 8〜10点</button>
-      <button class="tab" onclick="showCommentTab('mid',this)">😐 5〜7点</button>
-      <button class="tab" onclick="showCommentTab('low',this)">😞 4点以下</button>
+  <div class="section-title">お客様の声</div>
+  <div class="card">
+    <h2>コメント一覧</h2>
+    <div class="desc">施設全体の点数で色分け｜キーワードで検索できます</div>
+    <div class="c-tools">
+      <div class="tab-row" id="tab-row">
+        <button class="tab active" data-tab="all">すべて<span class="cnt"></span></button>
+        <button class="tab" data-tab="high">8〜10点<span class="cnt"></span></button>
+        <button class="tab" data-tab="mid">5〜7点<span class="cnt"></span></button>
+        <button class="tab" data-tab="low">4点以下<span class="cnt"></span></button>
+      </div>
+      <input id="c-search" class="c-search" type="search" placeholder="🔍 キーワード検索（例：サウナ、夕食、スタッフ）"/>
+      <select id="c-sort" class="c-sort">
+        <option value="new">新しい順</option>
+        <option value="old">古い順</option>
+        <option value="low">点数が低い順</option>
+        <option value="high">点数が高い順</option>
+      </select>
     </div>
     <div id="comment-list" class="comment-list"></div>
+    <button id="more-btn" class="more-btn" style="display:none;" onclick="commentLimit+=30;renderComments();">もっと見る</button>
   </div>
 
-  <!-- 月別サマリーテーブル -->
-  <div class="card wide">
-    <h2>📅 月別サマリー</h2>
-    <div style="overflow-x:auto;">
-      <table class="month-table" id="month-table">
+  <div class="section-title">月別サマリー</div>
+  <div class="card">
+    <div class="table-wrap">
+      <table class="month-table">
         <thead><tr>
           <th>月</th><th>件数</th><th>施設全体</th><th>スタッフ</th>
-          <th>清潔度</th><th>サウナ</th><th>夕食</th><th>朝食</th><th>焚き火</th><th>再利用%</th>
+          <th>清潔度</th><th>サウナ</th><th>夕食</th><th>朝食</th><th>焚き火</th><th>再利用</th>
         </tr></thead>
         <tbody id="month-tbody"></tbody>
       </table>
     </div>
+    <div class="legend-note">セルの色が濃い緑ほど高評価、赤ほど低評価です。行をクリックするとその月に絞り込みます。</div>
   </div>
 </main>
 
@@ -220,285 +257,270 @@ const STATIC_DATA = [{"date": "2025/05/02", "month": "2025-05", "age": null, "ov
 let RAW_DATA = [...STATIC_DATA];
 let filteredData = [...RAW_DATA];
 let charts = {};
-let currentCommentFilter = 'all';
+let currentCommentTab = 'all';
+let commentLimit = 30;
+
+const ITEMS = [
+  {k:'overall',l:'施設全体'},{k:'staff',l:'スタッフ'},{k:'clean',l:'清潔度'},
+  {k:'sauna',l:'サウナ'},{k:'dinner',l:'夕食'},{k:'breakfast',l:'朝食'},{k:'bonfire',l:'焚き火'},
+];
+const AGES = ['10代','20代','30代','40代','50代','60代以上','不明'];
+const C = {theme:'#6B4F2A',accent:'#A07840',green:'#2D6A4F',red:'#B23A2B',grey:'#C9BCA8',light:'#E6DCCB'};
+Chart.defaults.font.family = '"Zen Kaku Gothic New",sans-serif';
+Chart.defaults.color = '#7A6347';
+
+// ===== ユーティリティ =====
+const $ = id => document.getElementById(id);
+function avg(arr){ return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0; }
+function vals(rows,key){ return rows.map(r=>r[key]).filter(v=>v!=null && v!==''); }
+function fmt(rows,key){ const v=vals(rows,key); return v.length?avg(v).toFixed(1):'—'; }
+function level(v){ return v>=8?'good':v>=5?'mid':'bad'; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function npsOf(rows){
+  const o=vals(rows,'overall');
+  const p=o.filter(s=>s>=9).length, d=o.filter(s=>s<=6).length;
+  return {p,d,n:o.length-p-d,total:o.length,score:o.length?Math.round((p-d)/o.length*100):null};
+}
+function revisitOf(rows){
+  const yes=rows.filter(r=>r.revisit==='はい').length;
+  const ans=rows.filter(r=>r.revisit).length;
+  return {yes,ans,pct:ans?Math.round(yes/ans*100):null};
+}
+function heat(v){ // 5〜10点を赤→緑のセル背景に
+  if(v==null) return '';
+  const t=Math.max(0,Math.min(1,(v-5)/5));
+  const h=Math.round(5+t*140), l=Math.round(92-Math.abs(t-.5)*6);
+  return `background:hsl(${h},55%,${l-4}%);`;
+}
 
 // ===== フィルター =====
 function applyFilter(){
-  const period = document.getElementById('filter-period').value;
-  const month  = document.getElementById('filter-month').value;
-  const age    = document.getElementById('filter-age').value;
+  const period=$('filter-period').value, month=$('filter-month').value, age=$('filter-age').value;
   filteredData = RAW_DATA.filter(r=>{
-    if(period !== 'all' && !r.month.startsWith(period)) return false;
-    if(month  !== 'all' && r.month !== month) return false;
-    if(age    !== 'all' && (r.age || '不明') !== age) return false;
+    if(period!=='all' && !r.month.startsWith(period)) return false;
+    if(month!=='all' && r.month!==month) return false;
+    if(age!=='all' && (r.age||'不明')!==age) return false;
     return true;
   });
+  ['filter-period','filter-month','filter-age'].forEach(id=>$(id).classList.toggle('on',$(id).value!=='all'));
+  $('btn-reset').classList.toggle('show',[period,month,age].some(v=>v!=='all'));
+  commentLimit=30;
   render();
 }
 function resetFilter(){
-  document.getElementById('filter-period').value='all';
-  document.getElementById('filter-month').value='all';
-  document.getElementById('filter-age').value='all';
-  filteredData=[...RAW_DATA];
-  render();
+  ['filter-period','filter-month','filter-age'].forEach(id=>$(id).value='all');
+  buildMonthOptions();
+  applyFilter();
 }
-
-// ===== ユーティリティ =====
-function avg(arr){ return arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length) : 0; }
-function avgFmt(arr){ return arr.length ? avg(arr).toFixed(1) : '—'; }
-function numVals(key){ return filteredData.map(r=>r[key]).filter(v=>v!=null); }
-function scoreColor(v){ return v>=8?'#2D6A4F':v>=5?'#A07840':'#C0392B'; }
+function buildMonthOptions(){
+  const period=$('filter-period').value, sel=$('filter-month'), cur=sel.value;
+  const months=[...new Set(RAW_DATA.map(r=>r.month))].filter(m=>period==='all'||m.startsWith(period)).sort().reverse();
+  sel.length=1;
+  months.forEach(m=>{ const o=document.createElement('option'); o.value=m; o.textContent=m.replace('-','年')+'月'; sel.appendChild(o); });
+  sel.value = months.includes(cur)?cur:'all';
+}
+$('filter-period').addEventListener('change',()=>{buildMonthOptions();applyFilter();});
+$('filter-month').addEventListener('change',applyFilter);
+$('filter-age').addEventListener('change',applyFilter);
 
 // ===== KPI =====
 function renderKPI(){
-  const overall = numVals('overall');
-  const staff   = numVals('staff');
-  const clean   = numVals('clean');
-  const revisit = filteredData.filter(r=>r.revisit==='はい').length;
-  const revisitPct = filteredData.length ? Math.round(revisit/filteredData.length*100) : 0;
-
-  // NPS
-  const promoters  = overall.filter(s=>s>=9).length;
-  const detractors = overall.filter(s=>s<=6).length;
-  const nps = overall.length ? Math.round((promoters-detractors)/overall.length*100) : 0;
-
-  const kpis = [
-    {val:filteredData.length, lbl:'総回答数', sub:'件', cls:''},
-    {val:avgFmt(overall), lbl:'施設全体', sub:'/ 10点', cls: parseFloat(avgFmt(overall))>=8?'green':''},
-    {val:avgFmt(staff),   lbl:'スタッフ', sub:'/ 10点', cls: parseFloat(avgFmt(staff))>=8?'green':''},
-    {val:avgFmt(clean),   lbl:'清潔度',   sub:'/ 10点', cls: parseFloat(avgFmt(clean))>=8?'green':''},
-    {val:revisitPct+'%', lbl:'また利用したい', sub:'(はい)', cls: revisitPct>=80?'green':''},
-    {val:(nps>=0?'+':'')+nps, lbl:'NPS', sub:'推奨スコア', cls: nps>=50?'green':nps>=0?'blue':'red'},
-  ];
-  document.getElementById('kpi-row').innerHTML = kpis.map(k=>
-    `<div class="kpi"><div class="val ${k.cls}">${k.val}</div><div class="lbl">${k.lbl}</div><div class="sub">${k.sub}</div></div>`
-  ).join('');
-  document.getElementById('record-count').textContent = `表示中: ${filteredData.length}件`;
+  const nps=npsOf(filteredData), rv=revisitOf(filteredData);
+  const kpi=(lbl,val,unit,sub,lv)=>`<div class="kpi ${lv||''}"><div class="lbl">${lbl}</div><div class="val">${val}<small>${unit}</small></div><div class="sub">${sub}</div></div>`;
+  const sc=k=>{const v=fmt(filteredData,k);return kpi(ITEMS.find(i=>i.k===k).l,v,v==='—'?'':'/10',`n=${vals(filteredData,k).length}`,v==='—'?'':level(+v));};
+  $('kpi-row').innerHTML =
+    kpi('回答数',filteredData.length,'件','表示中のデータ','') +
+    sc('overall') + sc('staff') + sc('clean') +
+    kpi('また利用したい',rv.pct==null?'—':rv.pct,rv.pct==null?'':'%',`${rv.yes} / ${rv.ans}件`,rv.pct==null?'':rv.pct>=80?'good':rv.pct>=50?'mid':'bad') +
+    kpi('NPS',nps.score==null?'—':(nps.score>=0?'+':'')+nps.score,'','おすすめ度',nps.score==null?'':nps.score>=50?'good':nps.score>=0?'mid':'bad');
+  $('record-count').innerHTML=`表示中 <b>${filteredData.length}</b> / ${RAW_DATA.length}件`;
 }
 
 // ===== NPS =====
 function renderNPS(){
-  const overall = numVals('overall');
-  const promoters  = overall.filter(s=>s>=9).length;
-  const neutrals   = overall.filter(s=>s>=7&&s<=8).length;
-  const detractors = overall.filter(s=>s<=6).length;
-  const nps = overall.length ? Math.round((promoters-detractors)/overall.length*100) : 0;
-  const total = overall.length || 1;
-  document.getElementById('nps-val').textContent = (nps>=0?'+':'')+nps;
-  document.getElementById('nps-val').style.color = nps>=50?'var(--green)':nps>=0?'var(--blue)':'var(--red)';
-  document.getElementById('nps-d').textContent = detractors;
-  document.getElementById('nps-n').textContent = neutrals;
-  document.getElementById('nps-p').textContent = promoters;
-  document.getElementById('nps-bar').innerHTML = `
-    <div class="nps-seg" style="width:${detractors/total*100}%;background:var(--red);"></div>
-    <div class="nps-seg" style="width:${neutrals/total*100}%;background:#ccc;"></div>
-    <div class="nps-seg" style="width:${promoters/total*100}%;background:var(--green);"></div>
-  `;
+  const n=npsOf(filteredData), t=n.total||1;
+  $('nps-val').textContent = n.score==null?'—':(n.score>=0?'+':'')+n.score;
+  $('nps-val').style.color = n.score==null?'var(--muted)':n.score>=50?'var(--green)':n.score>=0?'var(--accent)':'var(--red)';
+  $('nps-d').textContent=`${n.d}名`; $('nps-n').textContent=`${n.n}名`; $('nps-p').textContent=`${n.p}名`;
+  $('nps-bar').innerHTML=`<div class="nps-seg" style="width:${n.d/t*100}%;background:var(--red);"></div><div class="nps-seg" style="width:${n.n/t*100}%;background:${C.grey};"></div><div class="nps-seg" style="width:${n.p/t*100}%;background:var(--green);"></div>`;
 }
 
 // ===== スコアバー =====
 function renderScoreBars(){
-  const keys = [
-    {k:'overall',l:'施設全体'},{k:'staff',l:'スタッフ'},{k:'clean',l:'清潔度'},
-    {k:'sauna',l:'サウナ'},{k:'dinner',l:'夕食'},{k:'breakfast',l:'朝食'},{k:'bonfire',l:'焚き火'},
-  ];
-  document.getElementById('score-bars').innerHTML = keys.map(({k,l})=>{
-    const vals = numVals(k);
-    const a = avg(vals);
-    const pct = a/10*100;
-    const col = a>=8?'var(--green)':a>=5?'var(--accent)':'var(--red)';
-    return `<div class="score-bar-wrap">
-      <div class="score-bar-lbl">${l}</div>
-      <div class="score-bar-bg"><div class="score-bar-fill" style="width:${pct.toFixed(1)}%;background:${col};"></div></div>
-      <div class="score-bar-val">${vals.length?a.toFixed(1):'—'}</div>
-    </div><div class="stat-row" style="margin-bottom:10px;padding-left:68px;">n=${vals.length}</div>`;
+  $('score-bars').innerHTML = ITEMS.map(({k,l})=>{
+    const v=vals(filteredData,k), a=avg(v);
+    const col={good:'var(--green)',mid:'var(--accent)',bad:'var(--red)'}[level(a)];
+    return `<div class="score-row"><div class="l">${l}</div>
+      <div class="score-bar-bg"><div class="score-bar-fill" style="width:${v.length?a*10:0}%;background:${col};"></div></div>
+      <div class="v" style="color:${v.length?col:'var(--muted)'}">${v.length?a.toFixed(1):'—'}</div>
+      <div class="n">n=${v.length}</div></div>`;
   }).join('');
 }
 
-// ===== 月別推移チャート =====
+// ===== チャート共通 =====
+function draw(key,id,cfg){ if(charts[key]) charts[key].destroy(); charts[key]=new Chart($(id),cfg); }
+
 function renderTrendChart(){
-  const months = [...new Set(filteredData.map(r=>r.month))].sort();
-  const monthData = months.map(m=>{
-    const rows = filteredData.filter(r=>r.month===m);
-    const vals = rows.map(r=>r.overall).filter(v=>v!=null);
-    return {month:m, avg:vals.length?avg(vals):null, n:rows.length};
-  });
-  if(charts.trend) charts.trend.destroy();
-  charts.trend = new Chart(document.getElementById('ch-trend'),{
-    type:'line',
-    data:{
-      labels: monthData.map(d=>d.month.replace('20','').replace('-','/')),
-      datasets:[{
-        label:'平均スコア',
-        data: monthData.map(d=>d.avg),
-        borderColor:'#6B4F2A', backgroundColor:'rgba(107,79,42,.1)',
-        borderWidth:2.5, pointRadius:5, pointBackgroundColor:'#6B4F2A',
-        tension:0.3, fill:true,
-      }]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      scales:{y:{min:0,max:10,ticks:{stepSize:2}},x:{ticks:{maxRotation:45}}},
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.parsed.y?.toFixed(1)} 点`}}},
-    }
+  const months=[...new Set(filteredData.map(r=>r.month))].sort();
+  const rowsOf=m=>filteredData.filter(r=>r.month===m);
+  const line=(k,label,color,hidden)=>({type:'line',label,yAxisID:'y',data:months.map(m=>{const v=vals(rowsOf(m),k);return v.length?+avg(v).toFixed(2):null;}),
+    borderColor:color,backgroundColor:color,borderWidth:k==='overall'?3:2,pointRadius:k==='overall'?4:2.5,tension:.3,spanGaps:true,hidden});
+  draw('trend','ch-trend',{
+    data:{labels:months.map(m=>m.slice(2).replace('-','/')),datasets:[
+      line('overall','施設全体',C.theme,false),
+      line('staff','スタッフ',C.green,true),
+      line('clean','清潔度','#1a6faa',true),
+      line('sauna','サウナ','#C2713A',true),
+      line('dinner','夕食','#8E5A9B',true),
+      {type:'bar',label:'回答件数',yAxisID:'y2',data:months.map(m=>rowsOf(m).length),backgroundColor:'rgba(201,188,168,.45)',borderRadius:4,order:10},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      scales:{y:{min:0,max:10,ticks:{stepSize:2},title:{display:true,text:'平均点'}},
+              y2:{position:'right',beginAtZero:true,grid:{display:false},title:{display:true,text:'件数'}},
+              x:{grid:{display:false}}},
+      plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8,font:{size:12}}},
+        tooltip:{callbacks:{label:c=>c.dataset.type==='bar'?` 回答 ${c.parsed.y}件`:` ${c.dataset.label} ${c.parsed.y?.toFixed(1)}点`}}}}
   });
 }
 
-// ===== 年代チャート =====
 function renderAgeChart(){
-  const ageCounts = {};
-  filteredData.forEach(r=>{const a=r.age||'不明';ageCounts[a]=(ageCounts[a]||0)+1;});
-  const labels = ['10代','20代','30代','40代','50代','60代以上','不明'].filter(k=>ageCounts[k]);
-  const palette = ['#6B4F2A','#A07840','#C8A870','#DDD0BB','#2D6A4F','#52B788','#ccc'];
-  if(charts.age) charts.age.destroy();
-  charts.age = new Chart(document.getElementById('ch-age'),{
-    type:'doughnut',
-    data:{labels,datasets:[{data:labels.map(l=>ageCounts[l]||0),backgroundColor:palette}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11}}}}}
+  const labels=AGES.filter(a=>filteredData.some(r=>(r.age||'不明')===a));
+  const rowsOf=a=>filteredData.filter(r=>(r.age||'不明')===a);
+  draw('age','ch-age',{
+    data:{labels,datasets:[
+      {type:'bar',label:'回答数',data:labels.map(a=>rowsOf(a).length),backgroundColor:labels.map(a=>a==='不明'?C.light:C.accent),borderRadius:6,yAxisID:'y',order:2},
+      {type:'line',label:'平均スコア',data:labels.map(a=>{const v=vals(rowsOf(a),'overall');return v.length?+avg(v).toFixed(2):null;}),
+        yAxisID:'y2',showLine:false,pointRadius:7,pointHoverRadius:9,backgroundColor:C.green,borderColor:'#fff',borderWidth:2,order:1},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{y:{beginAtZero:true,title:{display:true,text:'回答数'}},y2:{position:'right',min:0,max:10,grid:{display:false},title:{display:true,text:'平均点'}},x:{grid:{display:false}}},
+      plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8}},
+        tooltip:{callbacks:{label:c=>c.dataset.type==='bar'?` ${c.parsed.y}件`:` 平均 ${c.parsed.y?.toFixed(1)}点`}}}}
   });
 }
 
-// ===== 再利用チャート =====
 function renderRevisitChart(){
-  const yes = filteredData.filter(r=>r.revisit==='はい').length;
-  const no  = filteredData.length - yes;
-  if(charts.revisit) charts.revisit.destroy();
-  charts.revisit = new Chart(document.getElementById('ch-revisit'),{
-    type:'pie',
-    data:{labels:['はい','いいえ'],datasets:[{data:[yes,no],backgroundColor:['#2D6A4F','#C0392B']}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:12}}}}}
+  const cnt=v=>filteredData.filter(r=>r.revisit===v).length;
+  const data=[cnt('はい'),cnt('わからない'),cnt('いいえ')];
+  draw('revisit','ch-revisit',{
+    type:'doughnut',
+    data:{labels:['はい','わからない','いいえ'],datasets:[{data,backgroundColor:[C.green,C.grey,C.red],borderColor:'#fff',borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
+      plugins:{legend:{position:'right',labels:{usePointStyle:true,boxWidth:8,font:{size:13},
+        generateLabels:ch=>{const t=data.reduce((a,b)=>a+b,0)||1;return ch.data.labels.map((l,i)=>({text:`${l}　${data[i]}件（${Math.round(data[i]/t*100)}%）`,fillStyle:ch.data.datasets[0].backgroundColor[i],strokeStyle:'#fff',pointStyle:'circle',index:i}));}}}}}
   });
 }
 
-// ===== スコア分布チャート =====
 function renderDistChart(){
-  const dist = Array(10).fill(0);
-  numVals('overall').forEach(v=>{if(v>=1&&v<=10)dist[v-1]++;});
-  if(charts.dist) charts.dist.destroy();
-  charts.dist = new Chart(document.getElementById('ch-dist'),{
+  const dist=Array(10).fill(0);
+  vals(filteredData,'overall').forEach(v=>{if(v>=1&&v<=10)dist[v-1]++;});
+  draw('dist','ch-dist',{
     type:'bar',
-    data:{
-      labels:['1','2','3','4','5','6','7','8','9','10'],
-      datasets:[{
-        label:'件数',
-        data:dist,
-        backgroundColor:dist.map((_,i)=>i>=7?'rgba(45,106,79,.8)':i>=4?'rgba(160,120,64,.8)':'rgba(192,57,43,.8)'),
-        borderRadius:4,
-      }]
-    },
-    options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}},plugins:{legend:{display:false}}}
+    data:{labels:['1','2','3','4','5','6','7','8','9','10'],datasets:[{data:dist,
+      backgroundColor:dist.map((_,i)=>i>=8?C.green:i>=6?C.grey:C.red),borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{precision:0}},x:{grid:{display:false},title:{display:true,text:'点'}}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{title:c=>`${c[0].label}点`,label:c=>` ${c.parsed.y}件`}}}}
   });
 }
 
-// ===== コメント一覧 =====
-let currentCommentTab = 'all';
-function showCommentTab(tab, el){
-  currentCommentTab = tab;
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
+// ===== コメント =====
+const TAB_FILTER={all:()=>true,high:r=>r.overall>=8,mid:r=>r.overall>=5&&r.overall<=7,low:r=>r.overall!=null&&r.overall<=4};
+$('tab-row').addEventListener('click',e=>{
+  const b=e.target.closest('.tab'); if(!b) return;
+  currentCommentTab=b.dataset.tab; commentLimit=30;
+  document.querySelectorAll('#tab-row .tab').forEach(t=>t.classList.toggle('active',t===b));
   renderComments();
-}
+});
+$('c-search').addEventListener('input',()=>{commentLimit=30;renderComments();});
+$('c-sort').addEventListener('change',renderComments);
+
 function renderComments(){
-  const tab = currentCommentTab;
-  let rows = filteredData.filter(r=>r.comment && r.comment.trim());
-  if(tab==='high') rows=rows.filter(r=>r.overall>=8);
-  else if(tab==='mid') rows=rows.filter(r=>r.overall>=5&&r.overall<=7);
-  else if(tab==='low') rows=rows.filter(r=>r.overall<=4);
-  rows = [...rows].reverse();
-  if(!rows.length){
-    document.getElementById('comment-list').innerHTML='<div class="empty-msg">コメントがありません</div>';
-    return;
-  }
-  document.getElementById('comment-list').innerHTML = rows.map(r=>{
-    const s=r.overall;
-    const cls=s>=8?'score-high':s>=5?'score-mid':'score-low';
-    return `<div class="comment-item">
+  const q=$('c-search').value.trim();
+  let base=filteredData.filter(r=>r.comment && r.comment.trim());
+  if(q) base=base.filter(r=>r.comment.toLowerCase().includes(q.toLowerCase()));
+  document.querySelectorAll('#tab-row .tab').forEach(t=>t.querySelector('.cnt').textContent=base.filter(TAB_FILTER[t.dataset.tab]).length);
+  let rows=base.filter(TAB_FILTER[currentCommentTab]);
+  const s=$('c-sort').value;
+  rows.sort((a,b)=> s==='old'?a.date.localeCompare(b.date) : s==='low'?(a.overall??99)-(b.overall??99)||b.date.localeCompare(a.date)
+    : s==='high'?(b.overall??-1)-(a.overall??-1)||b.date.localeCompare(a.date) : b.date.localeCompare(a.date));
+  if(!rows.length){ $('comment-list').innerHTML='<div class="empty-msg">該当するコメントがありません</div>'; $('more-btn').style.display='none'; return; }
+  const re=q?new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'):null;
+  $('comment-list').innerHTML=rows.slice(0,commentLimit).map(r=>{
+    const sc=r.overall, lv=sc==null?'':sc>=8?'high':sc>=5?'mid':'low';
+    let text=esc(r.comment.trim()); if(re) text=text.replace(re,m=>`<mark>${m}</mark>`);
+    return `<div class="comment-item ${lv}">
       <div class="comment-meta">
-        <span class="score-badge ${cls}">${s!=null?s+'点':'—'}</span>
-        <span class="comment-date">${r.date}</span>
-        ${r.age?'<span style="font-size:11px;color:var(--muted);">'+r.age+'</span>':''}
-        ${r.revisit==='はい'?'<span style="font-size:11px;color:var(--green);">✓ また利用したい</span>':''}
+        <span class="score-badge score-${lv||'mid'}">${sc!=null?sc+'点':'—'}</span>
+        <span>${r.date}</span>${r.age?`<span>・${r.age}</span>`:''}
+        ${r.revisit==='はい'?'<span style="color:var(--green);">・また利用したい</span>':r.revisit==='いいえ'?'<span style="color:var(--red);">・再利用なし</span>':''}
       </div>
-      <div class="comment-text">${r.comment.replace(/</g,'&lt;')}</div>
-    </div>`;
+      <div class="comment-text">${text}</div></div>`;
   }).join('');
+  const rest=rows.length-commentLimit;
+  $('more-btn').style.display=rest>0?'block':'none';
+  $('more-btn').textContent=`もっと見る（残り${rest}件）`;
 }
 
 // ===== 月別テーブル =====
 function renderMonthTable(){
-  const months = [...new Set(filteredData.map(r=>r.month))].sort().reverse();
-  const tbody = document.getElementById('month-tbody');
-  const keys=['overall','staff','clean','sauna','dinner','breakfast','bonfire'];
-  tbody.innerHTML = months.map(m=>{
-    const rows = filteredData.filter(r=>r.month===m);
-    const revisitPct = rows.length?Math.round(rows.filter(r=>r.revisit==='はい').length/rows.length*100):0;
-    const cells = keys.map(k=>{
-      const vals=rows.map(r=>r[k]).filter(v=>v!=null);
-      const a=vals.length?avg(vals).toFixed(1):'—';
-      const col=vals.length?(parseFloat(a)>=8?'color:var(--green)':parseFloat(a)<=5?'color:var(--red)':''):'';
-      return `<td style="${col};font-weight:${vals.length?'700':'400'}">${a}</td>`;
-    }).join('');
-    return `<tr>
-      <td class="left" style="font-weight:700;">${m}</td>
-      <td>${rows.length}</td>
-      ${cells}
-      <td style="${revisitPct>=80?'color:var(--green)':''};">${revisitPct}%</td>
-    </tr>`;
-  }).join('');
+  const months=[...new Set(filteredData.map(r=>r.month))].sort().reverse();
+  const row=(label,rows,attr)=>{
+    const rv=revisitOf(rows);
+    const cells=ITEMS.map(({k})=>{const v=vals(rows,k);const a=v.length?avg(v):null;
+      return `<td style="${attr?'':heat(a)}">${a==null?'<span style="color:var(--border)">—</span>':a.toFixed(1)}</td>`;}).join('');
+    return `<tr ${attr}><td class="left">${label}</td><td>${rows.length}</td>${cells}<td style="${rv.pct!=null&&rv.pct>=80?'color:var(--green);font-weight:700':''}">${rv.pct==null?'—':rv.pct+'%'}</td></tr>`;
+  };
+  $('month-tbody').innerHTML = months.map(m=>row(m.replace('-','年')+'月',filteredData.filter(r=>r.month===m),`data-m="${m}"`).replace('<tr data-m','<tr title="クリックでこの月に絞り込み" data-m')).join('')
+    + (months.length>1?row('合計・平均',filteredData,'class="total"'):'');
 }
+$('month-tbody').addEventListener('click',e=>{
+  const tr=e.target.closest('tr[data-m]'); if(!tr) return;
+  const m=tr.dataset.m; $('filter-period').value=m.slice(0,4); buildMonthOptions(); $('filter-month').value=m;
+  applyFilter(); window.scrollTo({top:0,behavior:'smooth'});
+});
 
-// ===== 月フィルター選択肢 =====
-function buildMonthOptions(){
-  const months = [...new Set(RAW_DATA.map(r=>r.month))].sort();
-  const sel = document.getElementById('filter-month');
-  sel.length = 1;
-  months.forEach(m=>{
-    const opt=document.createElement('option');
-    opt.value=m; opt.textContent=m;
-    sel.appendChild(opt);
-  });
+// ===== CSV =====
+function downloadCSV(){
+  const head=['日付','月','年代','施設全体','スタッフ','清潔度','サウナ','夕食','朝食','焚き火','再利用','コメント'];
+  const keys=['date','month','age','overall','staff','clean','sauna','dinner','breakfast','bonfire','revisit','comment'];
+  const q=v=>v==null?'':/[",\n]/.test(String(v))?`"${String(v).replace(/"/g,'""')}"`:String(v);
+  const csv='﻿'+[head.join(','),...filteredData.map(r=>keys.map(k=>q(r[k])).join(','))].join('\r\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`totonoi_survey_${new Date().toISOString().slice(0,10)}.csv`; a.click();
 }
 
 // ===== メインレンダー =====
 function render(){
-  renderKPI();
-  renderNPS();
-  renderScoreBars();
-  renderTrendChart();
-  renderAgeChart();
-  renderRevisitChart();
-  renderDistChart();
-  renderComments();
-  renderMonthTable();
+  renderKPI(); renderNPS(); renderScoreBars();
+  renderTrendChart(); renderAgeChart(); renderRevisitChart(); renderDistChart();
+  renderComments(); renderMonthTable();
 }
 
 // ===== GASからデータ読み込み =====
-async function loadFromGAS() {
-  if (!GAS_URL || GAS_URL.includes("YOUR")) return;
-  try {
-    document.getElementById('last-updated').textContent = '更新中…';
-    const resp = await fetch(GAS_URL + "?action=data");
-    const gasData = await resp.json();
-    if (Array.isArray(gasData) && gasData.length > 0) {
-      // GASデータをSTATIC_DATAにマージ（日付重複排除）
-      const existing = new Set(STATIC_DATA.map(r=>r.date+'|'+(r.comment||'')));
-      const newRows = gasData.filter(r => !existing.has(r.date+'|'+(r.comment||'')));
-      RAW_DATA = [...STATIC_DATA, ...newRows].sort((a,b)=>a.date.localeCompare(b.date));
-      filteredData = [...RAW_DATA];
+async function loadFromGAS(){
+  if(!GAS_URL || GAS_URL.includes("YOUR")) return;
+  $('last-updated').textContent='更新中…';
+  try{
+    const resp=await fetch(GAS_URL+"?action=data");
+    const gasData=await resp.json();
+    if(Array.isArray(gasData) && gasData.length>0){
+      const existing=new Set(STATIC_DATA.map(r=>r.date+'|'+(r.comment||'')));
+      const newRows=gasData.filter(r=>!existing.has(r.date+'|'+(r.comment||'')));
+      RAW_DATA=[...STATIC_DATA,...newRows].sort((a,b)=>a.date.localeCompare(b.date));
       buildMonthOptions();
-      render();
-      document.getElementById('last-updated').textContent = '最終更新: ' + new Date().toLocaleString("ja-JP");
+      applyFilter(); // 絞り込み条件は維持
     }
-  } catch(e) {
-    console.warn("GAS読み込みエラー:", e);
-    document.getElementById('last-updated').textContent = 'オフラインデータ表示中';
+    $('last-updated').textContent='最終更新: '+new Date().toLocaleString("ja-JP",{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  }catch(e){
+    console.warn("GAS読み込みエラー:",e);
+    $('last-updated').textContent='オフラインデータ表示中';
   }
 }
 
 buildMonthOptions();
+applyFilter();
 loadFromGAS();
-document.getElementById('last-updated').textContent = '最終更新: 2026/05/03';
-render();
 </script>
 </body>
 </html>
